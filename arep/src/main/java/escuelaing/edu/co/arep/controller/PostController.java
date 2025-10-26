@@ -20,11 +20,15 @@ public class PostController {
 	}
 
 	@PostMapping("/{hiloId}/posts")
-	@Operation(summary = "Crear post", description = "Crear un post en el hilo indicado. Se requieren userId y content como query params.")
-	public Post createPost(
-			@Parameter(description = "ID del hilo") @PathVariable String hiloId,
-			@Parameter(description = "ID del usuario autor") @RequestParam String userId,
-			@Parameter(description = "Contenido del post (máx 140 caracteres)") @RequestParam String content) {
+	@Operation(summary = "Crear post", description = "Crear un post en el hilo indicado. Se requiere autenticación; el usuario autenticado será el autor.")
+	public Post createPost(@Parameter(description = "ID del hilo") @PathVariable String hiloId,
+						   @Parameter(description = "Contenido del post (máx 140 caracteres)") @RequestParam String content) {
+		// obtener usuario autenticado desde el contexto de seguridad
+		var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null || auth.getName() == null) {
+			throw new RuntimeException("No autenticado");
+		}
+		String userId = auth.getName();
 		return postService.createPost(hiloId, userId, content);
 	}
 

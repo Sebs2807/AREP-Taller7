@@ -1,0 +1,89 @@
+* {
+	box-sizing: border-box;
+	font-family: Inter, Segoe UI, Arial, sans-serif;
+}
+body {
+	margin: 0;
+	background: #f5f8fa;
+	color: #0f172a;
+}
+header {
+	background: #1d9bf0;
+	color: white;
+	padding: 1rem;
+}
+main {
+	display: flex;
+	gap: 1rem;
+	padding: 1rem;
+}
+section {
+	background: white;
+	padding: 1rem;
+	border-radius: 8px;
+	flex: 1;
+	min-height: 300px;
+}
+#hilos-panel {
+	max-width: 320px;
+}
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+input,
+textarea {
+	padding: 0.5rem;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+}
+button {
+	background: #1d9bf0;
+	color: white;
+	border: none;
+	padding: 0.5rem 1rem;
+	border-radius: 6px;
+	cursor: pointer;
+}
+button:disabled {
+	opacity: 0.6;
+}
+ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+li.hilo {
+	padding: 0.5rem;
+	border-bottom: 1px solid #e6eef7;
+	cursor: pointer;
+}
+li.hilo:hover {
+	background: #f1f7fb;
+}
+li.post {
+	padding: 0.75rem;
+	border-bottom: 1px solid #eee;
+}
+.post .meta {
+	font-size: 0.85rem;
+	color: #6b7280;
+}
+.hidden {
+	display: none;
+}
+.row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+#char-count {
+	margin-right: auto;
+	color: #374151;
+}
+footer {
+	padding: 1rem;
+	text-align: center;
+	color: #6b7280;
+}
