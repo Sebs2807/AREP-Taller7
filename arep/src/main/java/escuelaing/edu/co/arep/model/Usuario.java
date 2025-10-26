@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Data
@@ -20,6 +21,9 @@ public class Usuario {
 
 	@Column(unique = true, nullable = false)
 	private String username;
+
+	@JsonIgnore
+	private String password;
 
 	private String email;
 	private String displayName;

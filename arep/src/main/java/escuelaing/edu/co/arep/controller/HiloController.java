@@ -26,7 +26,11 @@ public class HiloController {
     @PostMapping
     @Operation(summary = "Crear hilo", description = "Crea un nuevo hilo; enviar objeto Hilo con owner.id")
     public Hilo create(@RequestBody Hilo body) {
-        var owner = usuarioRepo.findById(body.getOwner().getId()).orElseThrow();
+        var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null) {
+            throw new RuntimeException("No autenticado");
+        }
+        var owner = usuarioRepo.findById(auth.getName()).orElseThrow();
         body.setOwner(owner);
         return hiloRepo.save(body);
     }
