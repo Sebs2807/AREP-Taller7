@@ -48,30 +48,29 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        JwtAuthFilter jwtFilter = new JwtAuthFilter(jwtUtil);
-
-        http.cors().configurationSource(corsConfigurationSource()) 
+        http.cors().configurationSource(corsConfigurationSource())
             .and()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-            .authorizeHttpRequests()
-            
-            .requestMatchers(HttpMethod.GET, "/hilos", "/hilos/*/posts").permitAll()
-            
-            .requestMatchers(
-                "/auth/**", 
-                "/v3/api-docs/**", 
-                "/swagger-ui/**", 
-                "/swagger-ui.html",
-                "/", "/index.html", "/style.css", "/app.js"
-            ).permitAll()
-            
-            .requestMatchers(HttpMethod.POST, "/auth/register", "/usuarios").permitAll()
-            
-            .anyRequest().authenticated();
-
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers(HttpMethod.GET, "/hilos", "/hilos/*/posts").permitAll()
+                .requestMatchers(
+                    "/auth/**", 
+                    "/v3/api-docs/**", 
+                    "/swagger-ui/**", 
+                    "/swagger-ui.html",
+                    "/", "/index.html", "/style.css", "/app.js", "/auth.js", "/favicon.ico",
+                    "/static/**", "/*.js", "/*.css"
+                ).permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/register", "/usuarios").permitAll()
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt
+                    .jwkSetUri("https://cognito-idp.us-east-1.amazonaws.com/us-east-1_z8xIUETwu/.well-known/jwks.json")
+                )
+            );
         return http.build();
     }
 }

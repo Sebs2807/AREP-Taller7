@@ -1,86 +1,60 @@
 <!DOCTYPE html>
 <html lang="es">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<title>AREP - MiniTwitter</title>
-		<link rel="stylesheet" href="/style.css" />
-	</head>
-	<body>
-	<div id="auth-modal">
-		<div class="auth-box">
-			<h1>AREP — MiniTwitter</h1>
-			<p>Inicia sesión o regístrate para continuar</p>
-			<form id="login-form">
-				<input id="login-username" placeholder="usuario" />
-				<input
-						id="login-password"
-						type="password"
-						placeholder="contraseña"
-				/>
-				<button type="submit">Entrar</button>
-			</form>
-			<hr />
-			<form id="register-form">
-				<input id="reg-username" placeholder="nuevo usuario" />
-				<input
-						id="reg-password"
-						type="password"
-						placeholder="contraseña"
-				/>
-				<button type="submit">Registrarse</button>
-			</form>
-		</div>
-	</div>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AREP - MiniTwitter</title>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div id="auth-modal">
+    <div class="auth-box">
+        <h1>AREP — MiniTwitter</h1>
+        <p>Inicia sesión para continuar</p>
+        <button id="signIn">Sign In</button>
+    </div>
+</div>
 
-	<div id="app" class="hidden">
-		<header>
-			<h1>AREP — MiniTwitter</h1>
-			<p>Posts (máx 140 caracteres) y hilos</p>
-			<div id="user-info">
-				Conectado como <span id="user-name"></span>
-				<button id="logout">Salir</button>
-			</div>
-		</header>
+<div id="app" class="hidden">
+    <header>
+        <h1>AREP — MiniTwitter</h1>
+        <p>Posts (máx 140 caracteres) y hilos</p>
+        <div id="user-info">
+            Conectado como <span id="user-name"></span>
+            <button id="logout">Salir</button>
+        </div>
+    </header>
 
-		<main>
-			<section id="hilos-panel">
-				<h2>Hilos</h2>
-				<form id="create-hilo-form">
-					<input
-							id="hilo-title"
-							placeholder="Título del hilo"
-							required
-					/>
-					<button type="submit">Crear hilo</button>
-				</form>
-				<ul id="hilos-list"></ul>
-			</section>
+    <main>
+        <section id="hilos-panel">
+            <h2>Hilos</h2>
+            <form id="create-hilo-form">
+                <input id="hilo-title" placeholder="Título del hilo" required />
+                <button type="submit">Crear hilo</button>
+            </form>
+            <ul id="hilos-list"></ul>
+        </section>
 
-			<section id="posts-panel">
-				<h2 id="posts-panel-title">Posts</h2>
-				<div id="post-controls" class="hidden">
-					<form id="create-post-form">
-						<textarea
-								id="post-content"
-								maxlength="140"
-								placeholder="¿Qué está pasando? (máx 140)"
-						></textarea>
-						<div class="row">
-							<span id="char-count">0/140</span>
-							<button type="submit">Postear</button>
-						</div>
-					</form>
-				</div>
-				<ul id="posts-list"></ul>
-			</section>
-		</main>
+        <section id="posts-panel">
+            <h2 id="posts-panel-title">Posts</h2>
+            <div id="post-controls" class="hidden">
+                <form id="create-post-form">
+                    <textarea id="post-content" maxlength="140" placeholder="¿Qué está pasando? (máx 140)"></textarea>
+                    <div class="row">
+                        <span id="char-count">0/140</span>
+                        <button type="submit">Postear</button>
+                    </div>
+                </form>
+            </div>
+            <ul id="posts-list"></ul>
+        </section>
+    </main>
 
-		<footer>
-			<small>Interfaz demo</small>
-		</footer>
-	</div>
+    <footer>
+        <small>Interfaz demo</small>
+    </footer>
+</div>
 
-	<script src="app.js"></script>
-	</body>
+<script type="module" src="app.js"></script>
+</body>
 </html>

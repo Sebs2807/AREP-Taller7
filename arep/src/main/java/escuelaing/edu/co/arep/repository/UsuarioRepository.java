@@ -5,4 +5,5 @@ import escuelaing.edu.co.arep.model.Usuario;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 	Usuario findByUsername(String username);
+	java.util.Optional<Usuario> findByEmail(String email);
 }

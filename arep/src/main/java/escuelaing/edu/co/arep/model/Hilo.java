@@ -17,6 +17,16 @@ public class Hilo {
 	private Usuario owner;
 
 	private Instant createdAt = Instant.now();
+	
+	private String ownerEmail; 
+
+	public String getOwnerEmail() {
+		return ownerEmail;
+	}
+
+	public void setOwnerEmail(String ownerEmail) {
+		this.ownerEmail = ownerEmail;
+	}
 
 	public String getId() {
 		return id;

@@ -1,5 +1,6 @@
+import { signIn, handleCallback, signOutRedirect } from "./auth.js";
+
 const API_ROOT = "http://localhost:8080/hilos";
-const AUTH_ROOT = "http://localhost:8080/auth";
 
 const hilosList = document.getElementById("hilos-list");
 const postsList = document.getElementById("posts-list");
@@ -12,203 +13,154 @@ const charCount = document.getElementById("char-count");
 
 let currentHiloId = null;
 
-const loginForm = document.getElementById("login-form");
-const registerForm = document.getElementById("register-form");
-const userInfo = document.getElementById("user-info");
-const userNameSpan = document.getElementById("user-name");
+const loginBtn = document.getElementById("signIn");
 const logoutBtn = document.getElementById("logout");
+const userNameSpan = document.getElementById("user-name");
 
 function getToken() {
-	return localStorage.getItem("token");
-}
-function setToken(t) {
-	if (t) localStorage.setItem("token", t);
-	else localStorage.removeItem("token");
+    return localStorage.getItem("token");
 }
 function getAuthHeaders() {
-	const t = getToken();
-	return t ? { Authorization: "Bearer " + t } : {};
+    const t = getToken();
+    return t ? { Authorization: "Bearer " + t } : {};
 }
 
-function updateAuthUI() {
-	const t = getToken();
-	const authModal = document.getElementById("auth-modal");
-	const app = document.getElementById("app");
+async function initAuth() {
+    if (window.location.search.includes("code=")) {
+        await handleCallback();
+        window.history.replaceState({}, document.title, "/");
+    }
 
-	if (t) {
-		authModal.classList.add("hidden");
-		app.classList.remove("hidden");
-		userNameSpan.textContent = localStorage.getItem("username") || "";
-		fetchHilos();
-	} else {
-		authModal.classList.remove("hidden");
-		app.classList.add("hidden");
-		userNameSpan.textContent = "";
-	}
+    const token = getToken();
+    if (token) {
+        document.getElementById("auth-modal").classList.add("hidden");
+        document.getElementById("app").classList.remove("hidden");
+        userNameSpan.textContent = localStorage.getItem("username");
+        fetchHilos();
+    } else {
+        document.getElementById("auth-modal").classList.remove("hidden");
+        document.getElementById("app").classList.add("hidden");
+        userNameSpan.textContent = "";
+    }
 }
 
-
+loginBtn?.addEventListener("click", () => signIn());
 logoutBtn?.addEventListener("click", () => {
-	setToken(null);
-	localStorage.removeItem("username");
-	updateAuthUI();
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    window.location.href = "/";
 });
 
 async function fetchHilos() {
-	const res = await fetch(API_ROOT);
-	const hilos = await res.json();
-	renderHilos(hilos);
+    const res = await fetch(API_ROOT, { headers: getAuthHeaders() });
+    const hilos = await res.json();
+    renderHilos(hilos);
 }
 
 function renderHilos(hilos) {
-	hilosList.innerHTML = "";
-	hilos.forEach((h) => {
-		const li = document.createElement("li");
-		li.className = "hilo";
-		li.textContent = `${h.title || "(sin título)"}`;
-		li.addEventListener("click", () => selectHilo(h));
-		hilosList.appendChild(li);
-	});
+    hilosList.innerHTML = "";
+    hilos.forEach(h => {
+        const li = document.createElement("li");
+        li.className = "hilo";
+        li.textContent = h.title || "(sin título)";
+        li.addEventListener("click", () => selectHilo(h));
+        hilosList.appendChild(li);
+    });
 }
 
 function selectHilo(hilo) {
-	currentHiloId = hilo.id;
-	postsPanelTitle.textContent = `${hilo.title ? hilo.title : "Posts"}`;
-	postControls.classList.remove("hidden");
-	fetchPosts(hilo.id);
+    currentHiloId = hilo.id;
+    postsPanelTitle.textContent = hilo.title || "Posts";
+    postControls.classList.remove("hidden");
+    fetchPosts(hilo.id);
 }
 
 async function fetchPosts(hiloId) {
-	postsList.innerHTML = "<li>cargando...</li>";
-	const res = await fetch(`${API_ROOT}/${hiloId}/posts`);
-	if (!res.ok) {
-		postsList.innerHTML = "<li>Error al cargar posts</li>";
-		return;
-	}
-	const posts = await res.json();
-	renderPosts(posts);
+    postsList.innerHTML = "<li>cargando...</li>";
+    const res = await fetch(`${API_ROOT}/${hiloId}/posts`, { headers: getAuthHeaders() });
+    if (!res.ok) {
+        postsList.innerHTML = "<li>Error al cargar posts</li>";
+        return;
+    }
+    const posts = await res.json();
+    renderPosts(posts);
 }
 
 function renderPosts(posts) {
-	postsList.innerHTML = "";
-	if (!posts.length) {
-		postsList.innerHTML = "<li>No hay posts en este hilo</li>";
-		return;
-	}
-	posts.forEach((p) => {
-		const li = document.createElement("li");
-		li.className = "post";
-		li.innerHTML = `<div class="meta">${
-			p.author?.username || "anon"
-		} • ${new Date(p.createdAt).toLocaleString()}</div>
-                    <div class="content">${escapeHtml(p.content)}</div>`;
-		postsList.appendChild(li);
-	});
+    postsList.innerHTML = "";
+    if (!posts.length) {
+        postsList.innerHTML = "<li>No hay posts en este hilo</li>";
+        return;
+    }
+    posts.forEach(p => {
+        const li = document.createElement("li");
+        li.className = "post";
+        // Mostrar el correo si está disponible, si no el username, si no "anon"
+        const userLabel = p.author?.email || p.author?.username || "anon";
+        li.innerHTML = `<div class="meta">${userLabel} • ${new Date(p.createdAt).toLocaleString()}</div>
+                        <div class="content">${escapeHtml(p.content)}</div>`;
+        postsList.appendChild(li);
+    });
 }
 
 function escapeHtml(s) {
-	if (!s) return "";
-	return s
-		.replaceAll("&", "&amp;")
-		.replaceAll("<", "&lt;")
-		.replaceAll(">", "&gt;");
+    if (!s) return "";
+    return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
-createHiloForm.addEventListener("submit", async (e) => {
-	e.preventDefault();
-	const title = document.getElementById("hilo-title").value.trim();
-	if (!title) return alert("El título es requerido");
-	const payload = { title };
-	const headers = { "Content-Type": "application/json", ...getAuthHeaders() };
-	const res = await fetch(API_ROOT, {
-		method: "POST",
-		headers,
-		body: JSON.stringify(payload),
-	});
-	if (res.ok) {
-		document.getElementById("hilo-title").value = "";
-		fetchHilos();
-	} else if (res.status === 401) {
-		alert("Debes iniciar sesión");
-	} else {
-		const txt = await res.text();
-		alert("Error creando hilo: " + txt);
-	}
+
+createHiloForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    const title = document.getElementById("hilo-title").value.trim();
+    if (!title) return alert("El título es requerido");
+
+    const res = await fetch(API_ROOT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+        body: JSON.stringify({ title })
+    });
+
+    if (res.ok) {
+        document.getElementById("hilo-title").value = "";
+        fetchHilos();
+    } else if (res.status === 401) {
+        alert("Debes iniciar sesión");
+    } else {
+        alert("Error creando hilo: " + await res.text());
+    }
 });
+
 
 postContent.addEventListener("input", () => {
-	const len = postContent.value.length;
-	charCount.textContent = `${len}/140`;
-	if (len > 140) charCount.style.color = "red";
-	else charCount.style.color = "#374151";
+    const len = postContent.value.length;
+    charCount.textContent = `${len}/140`;
+    charCount.style.color = len > 140 ? "red" : "#374151";
 });
 
-createPostForm.addEventListener("submit", async (e) => {
-	e.preventDefault();
-	if (!currentHiloId) return alert("Seleccione un hilo");
-	const content = postContent.value.trim();
-	if (!content) return alert("El contenido no puede estar vacío");
-	if (content.length > 140)
-		return alert("El post debe tener máximo 140 caracteres");
+createPostForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!currentHiloId) return alert("Seleccione un hilo");
 
-	const params = new URLSearchParams({ content });
-	const headers = { ...getAuthHeaders() };
-	const res = await fetch(
-		`${API_ROOT}/${currentHiloId}/posts?${params.toString()}`,
-		{ method: "POST", headers }
-	);
-	if (res.ok) {
-		postContent.value = "";
-		charCount.textContent = "0/140";
-		fetchPosts(currentHiloId);
-	} else if (res.status === 401) {
-		alert("Debes iniciar sesión");
-	} else {
-		const txt = await res.text();
-		alert("Error creando post: " + txt);
-	}
+    const content = postContent.value.trim();
+    if (!content) return alert("El contenido no puede estar vacío");
+    if (content.length > 140) return alert("El post debe tener máximo 140 caracteres");
+
+    const res = await fetch(`${API_ROOT}/${currentHiloId}/posts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+        body: JSON.stringify({ content })
+    });
+
+    if (res.ok) {
+        postContent.value = "";
+        charCount.textContent = "0/140";
+        fetchPosts(currentHiloId);
+    } else if (res.status === 401) {
+        alert("Debes iniciar sesión");
+    } else {
+        alert("Error creando post: " + await res.text());
+    }
 });
 
-// auth handlers
-loginForm?.addEventListener("submit", async (e) => {
-	e.preventDefault();
-	const username = document.getElementById("login-username").value.trim();
-	const password = document.getElementById("login-password").value;
-	if (!username || !password) return alert("Username/password required");
-	const res = await fetch(AUTH_ROOT + "/login", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ username, password }),
-	});
-	if (res.ok) {
-		const body = await res.json();
-		setToken(body.token);
-		localStorage.setItem("username", body.username);
-		updateAuthUI();
-	} else {
-		alert("Login failed");
-	}
-});
 
-registerForm?.addEventListener("submit", async (e) => {
-	e.preventDefault();
-	const username = document.getElementById("reg-username").value.trim();
-	const password = document.getElementById("reg-password").value;
-	if (!username || !password) return alert("Username/password required");
-	const res = await fetch(AUTH_ROOT + "/register", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ username, password }),
-	});
-	if (res.ok) {
-		alert("Usuario creado, ahora inicia sesión");
-		document.getElementById("reg-username").value = "";
-		document.getElementById("reg-password").value = "";
-	} else {
-		const txt = await res.text();
-		alert("Error registro: " + txt);
-	}
-});
-
-updateAuthUI();
-fetchHilos();
+initAuth();
