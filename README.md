@@ -1,49 +1,153 @@
-# AREP - Taller 7
+# 🏛️ MiniTwitter – Microservicios en AWS Lambda
 
-Proyecto monolito Spring Boot para practicar un microblog (hilos, posts, usuarios).
+## 📄 Resumen del Proyecto
 
-## Estado actual
-- Backend: Spring Boot (Java 21)
-- Base: JPA con PostgreSQL (configuración en `src/main/resources/application.properties`)
-- Frontend: `frontend/index.html` (estático)
-- Añadido: OpenAPI / Swagger UI
+Este proyecto corresponde al Taller de Arquitectura Empresarial, donde se implementa una **aplicación web tipo Twitter** con una arquitectura moderna basada en **microservicios** desplegados en **AWS Lambda**. El sistema incluye autenticación JWT y un frontend JavaScript interactivo.
 
-## Construir y ejecutar
+La solución está compuesta por:
 
-Requisitos: Java 21, Maven. En PowerShell desde la carpeta `arep`:
+* **Backend:** Tres microservicios independientes (Usuarios, Hilos, Posts) desarrollados en Java (Spring Boot), expuestos como funciones Lambda y orquestados por API Gateway.
+* **Frontend:** Aplicación JS estática desplegada en S3, disponible en: [MiniTwitter S3](http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com)
 
-```powershell
-mvn test
-mvn spring-boot:run
+---
+
+## 🏗️ Arquitectura del Sistema
+
+**Diagrama general:**
+
+```
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│  Frontend   │───► │ API Gateway │───► │ AWS Lambda  │
+│   (S3)      │      │             │      │ (Usuarios)  │
+│  JS + HTML  │      │             │      │ (Hilos)     │
+└─────────────┘      └─────────────┘      │ (Posts)     │
+													  └─────────────┘
 ```
 
-La aplicación por defecto levanta en `http://localhost:8080`.
+* **Frontend:** Cliente JS consume los endpoints REST protegidos con JWT.
+* **Backend:** Cada microservicio gestiona su propio dominio y persistencia en PostgreSQL (NeonDB).
+* **Seguridad:** Autenticación y autorización con JWT; los tokens se generan y validan en el backend.
 
-## Swagger / OpenAPI
-Una vez la aplicación esté corriendo, la documentación y la UI de Swagger estarán disponibles en:
+---
 
-- Swagger documentation: `http://localhost:8080/swagger-ui.html` (o `/swagger-ui/index.html`)
+## 🔐 Configuración JWT
 
-Se puede usar esa UI para explorar y probar los endpoints (crear usuarios, hilos y posts).
+La autenticación se implementa usando **JSON Web Tokens (JWT)**. El backend incluye:
 
-## Endpoints principales
+* **Generación de tokens:** Al iniciar sesión, el usuario recibe un JWT firmado.
+* **Validación:** Los endpoints protegidos verifican el token usando filtros personalizados (`JwtAuthFilter`, `SecurityConfig`).
+* **Configuración:**
+  - El secreto y parámetros del JWT se definen en el backend (`application.properties` y clases de seguridad).
+  - El frontend almacena el token en localStorage y lo envía en el header `Authorization: Bearer <token>`.
 
-- GET `/usuarios` — listar usuarios
-- POST `/usuarios` — crear usuario (envía JSON de `Usuario`)
-- GET `/hilos` — listar hilos
-- POST `/hilos` — crear hilo (envía JSON de `Hilo`, o usa desde Swagger)
-- POST `/hilos/{hiloId}/posts?userId={userId}&content={texto}` — crear un post en un hilo
-- GET `/hilos/{hiloId}/posts` — listar posts de un hilo
+---
 
-Ejemplo rápido (curl):
+## 🌐 Frontend JS en S3
 
-```powershell
-# Crear usuario
-curl -X POST -H "Content-Type: application/json" -d '{"username":"alice","email":"a@x.com","displayName":"Alice"}' http://localhost:8080/usuarios
+Se desarrolló una aplicación JS que permite:
 
-# Crear hilo (body JSON)
-curl -X POST -H "Content-Type: application/json" -d '{"title":"Mi hilo","owner":{"id":"usuario_xxx"}}' http://localhost:8080/hilos
+* Registro y login de usuarios.
+* Creación y visualización de hilos y posts.
+* Consumo de los microservicios vía fetch/AJAX.
 
-# Crear post (params)
-curl -X POST "http://localhost:8080/hilos/{hiloId}/posts?userId={userId}&content=Hola%20mundo"
-```
+**URL pública:** [http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com](http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com)
+
+---
+
+## 📦 Endpoints Principales
+
+* **Usuarios:**
+  - `GET /usuarios` – Listar usuarios
+  - `POST /usuarios` – Crear usuario
+
+* **Hilos:**
+  - `GET /hilos` – Listar hilos
+  - `POST /hilos` – Crear hilo (requiere JWT)
+
+* **Posts:**
+  - `GET /hilos/{hiloId}/posts` – Listar posts de un hilo
+  - `POST /hilos/{hiloId}/posts` – Crear post (requiere JWT)
+
+---
+
+## ⚙️ Instrucciones de Implementación
+
+### ✅ Requisitos
+
+* AWS CLI y SAM CLI
+* Java 17 y Maven
+* PostgreSQL NeonDB
+* Cuenta AWS con permisos Lambda y S3
+
+---
+
+### 🧩 Ejecución local
+
+1. Clonar el repositorio:
+	```powershell
+	git clone https://github.com/Sebs2807/AREP-Taller7.git
+	cd AREP-Taller7
+	```
+2. Compilar y ejecutar backend:
+	```powershell
+	mvn clean package -DskipTests
+	sam local start-api --template template.yaml
+	```
+3. Probar endpoints en Postman:
+	```
+	POST http://localhost:3000/usuarios
+	POST http://localhost:3000/auth/login
+	```
+
+---
+
+### ☁️ Despliegue en AWS Lambda y S3
+
+1. Empaquetar y desplegar backend:
+	```powershell
+	sam deploy --guided --template-file template.yaml --stack-name minitwitter-backend --s3-bucket <tu-bucket>
+	```
+2. Subir frontend a S3:
+	```powershell
+	aws s3 sync src/main/resources/static/ s3://minitwitter-camilo --acl public-read
+	```
+3. Acceder a la app:
+	[http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com](http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com)
+
+---
+
+## 🛠 Tecnologías Utilizadas
+
+| Tecnología                  | Descripción                                    |
+| --------------------------- | ---------------------------------------------- |
+| **AWS Lambda**              | Backend serverless para microservicios         |
+| **Spring Boot**             | Framework Java para REST y seguridad           |
+| **JWT**                     | Autenticación y autorización                  |
+| **PostgreSQL (NeonDB)**     | Base de datos relacional en la nube            |
+| **AWS S3**                  | Hosting estático para frontend JS              |
+| **API Gateway**             | Orquestación y routing de APIs                 |
+| **AWS SAM**                 | Infraestructura como código y despliegue       |
+| **JavaScript**              | Frontend dinámico y consumo de APIs            |
+
+---
+
+## 📸 Pruebas y Capturas
+
+* Registro y login de usuarios
+* Creación de hilos y posts
+* Pruebas de endpoints protegidos con JWT
+* Acceso público al frontend JS
+
+---
+
+## 📚 Documentación y Referencias
+
+* [AWS Lambda + Java](https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html)
+* [Spring Boot + JWT](https://spring.io/guides/gs/securing-web/)
+* [AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html)
+
+---
+
+## 🎥 Video de Implementación
+
+* (Agrega aquí el enlace a tu video de presentación si lo tienes)
