@@ -1,5 +1,5 @@
-const API_ROOT = "/hilos";
-const AUTH_ROOT = "/auth";
+const API_ROOT = "http://localhost:8080/hilos";
+const AUTH_ROOT = "http://localhost:8080/auth";
 
 const hilosList = document.getElementById("hilos-list");
 const postsList = document.getElementById("posts-list");

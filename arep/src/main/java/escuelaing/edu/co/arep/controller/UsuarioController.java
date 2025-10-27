@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com")
 @Tag(name = "Usuarios", description = "Operaciones para gestionar usuarios")
 public class UsuarioController {
 	private final UsuarioRepository usuarioRepo;

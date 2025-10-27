@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("hilos")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com")
 @Tag(name = "Posts", description = "Operaciones para crear y listar posts dentro de hilos")
 public class PostController {
 	private final PostService postService;
