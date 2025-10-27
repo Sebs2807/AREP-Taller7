@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 @RestController
 @RequestMapping("/hilos")
-@CrossOrigin(origins = "http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com")
+@CrossOrigin(origins = "https://minitwitter-camilo.s3.amazonaws.com")
 @Tag(name = "Posts", description = "Operaciones para crear y listar posts dentro de hilos")
 public class PostController {
 

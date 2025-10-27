@@ -48,7 +48,12 @@ loginBtn?.addEventListener("click", () => signIn());
 logoutBtn?.addEventListener("click", () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
-    window.location.href = "/";
+    
+    //const hostedUiDomain = "https://arep.auth.us-east-1.amazoncognito.com";
+    //const clientId = "5ioimrqnbse75p8d0evu3c85n0";
+    //const logoutUri = "https://minitwitter-camilo.s3.amazonaws.com/index.html";
+    //window.location.href = `${hostedUiDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+	window.location.href = "https://minitwitter-camilo.s3.amazonaws.com/index.html";
 });
 
 async function fetchHilos() {

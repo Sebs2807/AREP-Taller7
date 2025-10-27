@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com")
+@CrossOrigin(origins = "https://minitwitter-camilo.s3.amazonaws.com/index.html")
 public class AuthController {
 
     private final UsuarioRepository usuarioRepo;

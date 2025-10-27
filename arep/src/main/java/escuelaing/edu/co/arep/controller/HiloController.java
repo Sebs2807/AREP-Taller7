@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/hilos")
-@CrossOrigin(origins = "http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com")
+@CrossOrigin(origins = "https://minitwitter-camilo.s3.amazonaws.com")
 @Tag(name = "Hilos", description = "Operaciones para gestionar hilos (streams)")
 public class HiloController {
 

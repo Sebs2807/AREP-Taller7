@@ -35,7 +35,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(
-            List.of("http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com")
+            List.of("https://minitwitter-camilo.s3.amazonaws.com")
         );
         configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
