@@ -7,42 +7,50 @@
 		<link rel="stylesheet" href="/style.css" />
 	</head>
 	<body>
-		<header>
+	<div id="auth-modal">
+		<div class="auth-box">
 			<h1>AREP — MiniTwitter</h1>
-			<p>Posts (máx 140 caracteres) y hilos</p>
-			<div id="auth-area">
-				<form id="login-form">
-					<input id="login-username" placeholder="usuario" />
-					<input
+			<p>Inicia sesión o regístrate para continuar</p>
+			<form id="login-form">
+				<input id="login-username" placeholder="usuario" />
+				<input
 						id="login-password"
 						type="password"
 						placeholder="contraseña"
-					/>
-					<button type="submit">Entrar</button>
-				</form>
-				<form id="register-form">
-					<input id="reg-username" placeholder="nuevo usuario" />
-					<input
+				/>
+				<button type="submit">Entrar</button>
+			</form>
+			<hr />
+			<form id="register-form">
+				<input id="reg-username" placeholder="nuevo usuario" />
+				<input
 						id="reg-password"
 						type="password"
 						placeholder="contraseña"
-					/>
-					<button type="submit">Registrarse</button>
-				</form>
-				<div id="user-info" class="hidden">
-					Conectado como <span id="user-name"></span>
-					<button id="logout">Salir</button>
-				</div>
+				/>
+				<button type="submit">Registrarse</button>
+			</form>
+		</div>
+	</div>
+
+	<div id="app" class="hidden">
+		<header>
+			<h1>AREP — MiniTwitter</h1>
+			<p>Posts (máx 140 caracteres) y hilos</p>
+			<div id="user-info">
+				Conectado como <span id="user-name"></span>
+				<button id="logout">Salir</button>
 			</div>
 		</header>
+
 		<main>
 			<section id="hilos-panel">
 				<h2>Hilos</h2>
 				<form id="create-hilo-form">
 					<input
-						id="hilo-title"
-						placeholder="Título del hilo"
-						required
+							id="hilo-title"
+							placeholder="Título del hilo"
+							required
 					/>
 					<button type="submit">Crear hilo</button>
 				</form>
@@ -54,9 +62,9 @@
 				<div id="post-controls" class="hidden">
 					<form id="create-post-form">
 						<textarea
-							id="post-content"
-							maxlength="140"
-							placeholder="¿Qué está pasando? (máx 140)"
+								id="post-content"
+								maxlength="140"
+								placeholder="¿Qué está pasando? (máx 140)"
 						></textarea>
 						<div class="row">
 							<span id="char-count">0/140</span>
@@ -64,14 +72,15 @@
 						</div>
 					</form>
 				</div>
-
 				<ul id="posts-list"></ul>
 			</section>
 		</main>
+
 		<footer>
 			<small>Interfaz demo</small>
 		</footer>
+	</div>
 
-		<script src="/app.js"></script>
+	<script src="/app.js"></script>
 	</body>
 </html>

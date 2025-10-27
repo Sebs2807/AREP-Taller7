@@ -32,18 +32,21 @@ function getAuthHeaders() {
 
 function updateAuthUI() {
 	const t = getToken();
+	const authModal = document.getElementById("auth-modal");
+	const app = document.getElementById("app");
+
 	if (t) {
-		loginForm.classList.add("hidden");
-		registerForm.classList.add("hidden");
-		userInfo.classList.remove("hidden");
+		authModal.classList.add("hidden");
+		app.classList.remove("hidden");
 		userNameSpan.textContent = localStorage.getItem("username") || "";
+		fetchHilos();
 	} else {
-		loginForm.classList.remove("hidden");
-		registerForm.classList.remove("hidden");
-		userInfo.classList.add("hidden");
+		authModal.classList.remove("hidden");
+		app.classList.add("hidden");
 		userNameSpan.textContent = "";
 	}
 }
+
 
 logoutBtn?.addEventListener("click", () => {
 	setToken(null);
