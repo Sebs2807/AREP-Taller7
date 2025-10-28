@@ -17,11 +17,11 @@ La solución está compuesta por:
 
 ```
 ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│  Frontend   │───► │ API Gateway │───► │ AWS Lambda  │
+│  Frontend   │───► │ API Gateway │───►   │ AWS Lambda  │
 │   (S3)      │      │             │      │ (Usuarios)  │
 │  JS + HTML  │      │             │      │ (Hilos)     │
 └─────────────┘      └─────────────┘      │ (Posts)     │
-													  └─────────────┘
+										  └─────────────┘
 ```
 
 * **Frontend:** Cliente JS consume los endpoints REST protegidos con JWT.
