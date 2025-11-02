@@ -1,6 +1,6 @@
 import { signIn, handleCallback, signOutRedirect } from "./auth.js";
 
-const API_ROOT = "http://localhost:8080/hilos";
+const API_ROOT = "https://n08ggcxwob.execute-api.us-east-1.amazonaws.com/api/hilos";
 
 const hilosList = document.getElementById("hilos-list");
 const postsList = document.getElementById("posts-list");
