@@ -134,25 +134,14 @@ Se desarrolló una aplicación JS que permite:
 ## 📸 Pruebas y Capturas
 
 * Registro y login de usuarios
+  
 * Creación de hilos y posts
+  
 * Pruebas de endpoints protegidos con JWT
+  
 * Acceso público al frontend JS
 
 ---
-
-## 📚 Documentación y Referencias
-
-* [AWS Lambda + Java](https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html)
-* [Spring Boot + JWT](https://spring.io/guides/gs/securing-web/)
-* [AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html)
-* [Spring Security OAuth2 / JWT](https://spring.io/guides/tutorials/spring-security-and-oauth2/)
-* [Maven Shade Plugin](https://maven.apache.org/plugins/maven-shade-plugin/)
-
----
-
-## 🎥 Video de Implementación
-
-* (Agrega aquí el enlace a tu video de presentación si lo tienes)
 
 ### Microservicios
 
@@ -201,3 +190,19 @@ Esto se repitió para los 3 microservicios.
 	- Fallas parciales: en microservicios un fallo afecta solo el servicio malo si está bien aislado; en monolito un fallo puede tirar toda la app.
 
 En resumen: para proyectos que necesiten alta escalabilidad es bueno usar una infraestructura por microservicios, aunque si es un proyecto pequeño no tanto porque agrega complejidad de despliegues e infraestructura como autenticación para cada microservicio, roles, VPC y demás.
+
+
+## 🎥 Video de Implementación
+
+https://youtu.be/BeSUwblZcsg
+
+
+## 📚 Documentación y Referencias
+
+* [AWS Lambda + Java](https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html)
+* [Spring Boot + JWT](https://spring.io/guides/gs/securing-web/)
+* [AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html)
+* [Spring Security OAuth2 / JWT](https://spring.io/guides/tutorials/spring-security-and-oauth2/)
+* [Maven Shade Plugin](https://maven.apache.org/plugins/maven-shade-plugin/)
+
+
