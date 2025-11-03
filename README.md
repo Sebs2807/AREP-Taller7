@@ -15,19 +15,9 @@ La solución está compuesta por:
 
 **Diagrama general:**
 
-```
-┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│  Frontend   │───► │ API Gateway │───►   │ AWS Lambda  │
-│   (S3)      │      │             │      │ (Usuarios)  │
-│  JS + HTML  │      │             │      │ (Hilos)     │
-└─────────────┘      └─────────────┘      │ (Posts)     │
-										  └─────────────┘
-```
+![alt text](assets/diagrama.png)
 
-* **Frontend:** Cliente JS consume los endpoints REST protegidos con JWT.
-* **Backend:** Cada microservicio gestiona su propio dominio y persistencia en PostgreSQL.
-* **Seguridad:** Autenticación y autorización con JWT; los tokens se generan y validan en el backend.
-
+La arquitectura implementa una aplicación de microservicios desplegada en AWS, donde el usuario interactúa con un frontend estático alojado en S3 (minitwitter-camilo). El frontend se autentica mediante AWS Cognito, que proporciona tokens JWT con información del usuario (email, username, cognito:username). Todas las peticiones del cliente pasan a través de un API Gateway que actúa como punto de entrada único y enruta las solicitudes hacia tres microservicios implementados como funciones Lambda: hilo-service (gestión de hilos), post-service (gestión de publicaciones) y usuario-service (autenticación y gestión de usuarios). Estos tres microservicios están desplegados en un VPC y comparten acceso a una base de datos común (RDS/DynamoDB) donde persisten la información de hilos, posts y usuarios. API Gateway valida los tokens JWT de Cognito antes de invocar las funciones Lambda, asegurando que solo usuarios autenticados puedan acceder a los recursos protegidos.
 ---
 
 ## 🔐 Configuración JWT
