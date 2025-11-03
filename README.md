@@ -25,7 +25,7 @@ La solución está compuesta por:
 ```
 
 * **Frontend:** Cliente JS consume los endpoints REST protegidos con JWT.
-* **Backend:** Cada microservicio gestiona su propio dominio y persistencia en PostgreSQL (NeonDB).
+* **Backend:** Cada microservicio gestiona su propio dominio y persistencia en PostgreSQL.
 * **Seguridad:** Autenticación y autorización con JWT; los tokens se generan y validan en el backend.
 
 ---
@@ -44,11 +44,18 @@ La autenticación se implementa usando **JSON Web Tokens (JWT)**. El backend inc
 
 ## 🌐 Frontend JS en S3
 
-Se desarrolló una aplicación JS que permite:
+1. Se desarrolló una aplicación JS que permite:
 
 * Registro y login de usuarios.
 * Creación y visualización de hilos y posts.
 * Consumo de los microservicios vía fetch/AJAX.
+
+2. Subimos los archivos de nuestra aplicación a S3:
+
+<img width="1209" height="575" alt="image" src="https://github.com/user-attachments/assets/efd50bfa-b1d3-4f21-8353-b646f0538112" />
+
+Como se puede evidenciar en la imagen, subimos el archivo .html, .js y .css de nuestro front.
+
 
 **URL pública:** [http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com](http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com)
 
@@ -66,7 +73,7 @@ Se desarrolló una aplicación JS que permite:
 
 * **Posts:**
   - `GET /hilos/{hiloId}/posts` – Listar posts de un hilo
-  - `POST /hilos/{hiloId}/posts` – Crear post (requiere JWT)
+  - `POST /hilos/{hiloId}/posts` – Crear post 
 
 ---
 
@@ -74,9 +81,8 @@ Se desarrolló una aplicación JS que permite:
 
 ### ✅ Requisitos
 
-* AWS CLI y SAM CLI
 * Java 17 y Maven
-* PostgreSQL NeonDB
+* PostgreSQL
 * Cuenta AWS con permisos Lambda y S3
 
 ---
@@ -91,28 +97,13 @@ Se desarrolló una aplicación JS que permite:
 2. Compilar y ejecutar backend:
 	```powershell
 	mvn clean package -DskipTests
-	sam local start-api --template template.yaml
+	mvn spring-boot:run
 	```
 3. Probar endpoints en Postman:
 	```
 	POST http://localhost:3000/usuarios
 	POST http://localhost:3000/auth/login
 	```
-
----
-
-### ☁️ Despliegue en AWS Lambda y S3
-
-1. Empaquetar y desplegar backend:
-	```powershell
-	sam deploy --guided --template-file template.yaml --stack-name minitwitter-backend --s3-bucket <tu-bucket>
-	```
-2. Subir frontend a S3:
-	```powershell
-	aws s3 sync src/main/resources/static/ s3://minitwitter-camilo --acl public-read
-	```
-3. Acceder a la app:
-	[http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com](http://minitwitter-camilo.s3-website-us-east-1.amazonaws.com)
 
 ---
 
@@ -134,12 +125,41 @@ Se desarrolló una aplicación JS que permite:
 ## 📸 Pruebas y Capturas
 
 * Registro y login de usuarios
+
+  Nos registramos con un usuario del pool de usuarios de Cognito:
+
+  <img width="408" height="287" alt="image" src="https://github.com/user-attachments/assets/c9f93956-7f14-410a-b586-07c1f84c0fbd" />
+
+<img width="382" height="264" alt="image" src="https://github.com/user-attachments/assets/c4584a14-084f-4228-856a-d2a9164e95fb" />
+
   
 * Creación de hilos y posts
+
+Creando un Hilo
+
+<img width="1208" height="530" alt="image" src="https://github.com/user-attachments/assets/2fc33ec8-7c4e-4f1e-898b-39ae23f149d7" />
+
+Vemos que se crea de forma correcta
+
+<img width="410" height="576" alt="image" src="https://github.com/user-attachments/assets/00248c67-5908-4c07-aa76-38fdcea9cdf6" />
+
+
+Creando un Post
+
+<img width="1228" height="535" alt="image" src="https://github.com/user-attachments/assets/6a5a387f-5a4b-40f2-92db-216c39c3c935" />
+
+Vemos que se crea de forma correcta
+
+<img width="1235" height="504" alt="image" src="https://github.com/user-attachments/assets/b1914025-a917-4e4f-9159-d994ffcd717c" />
+
   
-* Pruebas de endpoints protegidos con JWT
+* Acceso público al frontend JS desde s3
+
+Accediendo desde el link que nos proporciona s3, vemos que la aplicación funciona correctamente
+
+<img width="1235" height="579" alt="image" src="https://github.com/user-attachments/assets/c451e8ea-7c91-4def-a1ae-55dc9998f213" />
+
   
-* Acceso público al frontend JS
 
 ---
 
