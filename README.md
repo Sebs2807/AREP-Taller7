@@ -145,9 +145,59 @@ Se desarrolló una aplicación JS que permite:
 * [AWS Lambda + Java](https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html)
 * [Spring Boot + JWT](https://spring.io/guides/gs/securing-web/)
 * [AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html)
+* [Spring Security OAuth2 / JWT](https://spring.io/guides/tutorials/spring-security-and-oauth2/)
+* [Maven Shade Plugin](https://maven.apache.org/plugins/maven-shade-plugin/)
 
 ---
 
 ## 🎥 Video de Implementación
 
 * (Agrega aquí el enlace a tu video de presentación si lo tienes)
+
+### Microservicios
+
+- Empaquetamos cada microservicio como un "shaded" JAR usando `maven-shade-plugin`. Los artefactos finales que se suben a Lambda son los JAR grandes en `target/` los cuales tienen por dentro los archivos .class de las clases java compiladas y las dependencias necesarias usadas por spring boot y escritas en el POM. 
+- Homogeneizamos la compilación a Java 17 para los tres módulos (para usar runtime Java 17 en Lambda y evitar incompatibilidades).
+- Solucionamos errores de inicio en Lambda relacionados con clases faltantes añadiendo dependencias que habían sido excluidas indirectamente (entre las más relevantes: ByteBuddy y soporte JWT de Spring Security).
+
+Servicios empaquetados (ejemplos de rutas generadas):
+
+- `hilo-service`: target/hilo-service-lambda.jar
+- `post-service`: target/post-service.jar
+- `usuario-service`: target/usuario-service.jar
+
+### Despliegue
+
+1. Construir cada servicio:
+
+Para esto nos dirijimos al directorio raiz de cada microservicio (donde está ubicado el POM) y ejecutamos el siguiente comando:
+```powershell
+mvn clean package
+```
+
+2. Verificar contenido del JAR (asegurarnos de que las clases necesarias estén incluidas):
+
+Este comando lo que nos permite es ver el contenido del JAR, esto nos ayudó a detectar errores de dependencias faltantes o empaquetamientos mal hechos por usar el empaquetador de spring.
+```powershell
+jar tf target/<<archivo.jar>>
+```
+
+3. Subir/actualizar la función Lambda:
+
+Para subir el codigo a AWS Lambda se carga el mismo archivo JAR directamente o se puede subir a un bucket s3 y de ahí a las funciones lambda si el archivo es muy pesado, para este caso los subimos directamente a Lambda
+
+Esto se repitió para los 3 microservicios.
+
+## Por qué esta arquitectura (microservicios + Lambda) y qué cambia respecto a un monolito
+
+- Ventajas de microservicios en Lambda:
+	- Deploy independiente: cada servicio se empaqueta y despliega por separado. Si cambia la lógica de Usuarios no afecta a Hilos ni Posts.
+	- Escalado automático: Lambda escala cada función según la demanda, puediendo asignar memoria/CPU por función.
+	- Costos por uso: Se paga por ejecución (billed duration) en lugar de tener instancias siempre activas al ser una función serverless.
+
+- Lo que cambia frente a un monolito:
+	- Comunicación: en microservicios se necesita diseñar APIs y (si aplica) una capa de gateway; en un monolito todo está en la misma JVM y las llamadas son locales, más simples pero menos aisladas.
+	- Complejidad operativa: más despliegues, más IAM/roles, monitoreo y tracing entre servicios. En monolito la operativa es más sencilla inicialmente.
+	- Fallas parciales: en microservicios un fallo afecta solo el servicio malo si está bien aislado; en monolito un fallo puede tirar toda la app.
+
+En resumen: para proyectos que necesiten alta escalabilidad es bueno usar una infraestructura por microservicios, aunque si es un proyecto pequeño no tanto porque agrega complejidad de despliegues e infraestructura como autenticación para cada microservicio, roles, VPC y demás.

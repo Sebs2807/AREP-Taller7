@@ -17,7 +17,7 @@
 	<name>Usuario Service</name>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 		<spring-boot.version>3.5.7</spring-boot.version>
 	</properties>
 
@@ -90,6 +90,19 @@
 			</exclusions>
 		</dependency>
 
+		<!-- ByteBuddy required by Hibernate (do not exclude unless provided elsewhere) -->
+		<dependency>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy</artifactId>
+			<version>1.14.10</version>
+		</dependency>
+
+		<!-- OAuth2 resource server support (BearerTokenResolver) -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-resource-server</artifactId>
+		</dependency>
+
 		<!-- Driver de PostgreSQL -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -123,9 +136,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
 				<configuration>
-					<source>21</source>
-					<target>21</target>
+					<source>17</source>
+					<target>17</target>
 				</configuration>
 			</plugin>
 
@@ -135,8 +149,9 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.5.1</version>
 				<configuration>
-					<createDependencyReducedPom>true</createDependencyReducedPom>
-					<minimizeJar>true</minimizeJar>
+					<!-- Make a full fat JAR for Lambda. Avoid minimizing (reflection) and dependency-reduced POM problems -->
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<minimizeJar>false</minimizeJar>
 					<finalName>post-service</finalName>
 					<filters>
 						<filter>
@@ -159,6 +174,15 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<!-- Avoid Spring Boot repackage (we create our own fat JAR with shade) -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
