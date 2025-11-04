@@ -38,7 +38,7 @@ La autenticación se implementa usando **JSON Web Tokens (JWT)**. El backend inc
 
 * Registro y login de usuarios.
 * Creación y visualización de hilos y posts.
-* Consumo de los microservicios vía fetch/AJAX.
+* Consumo de los microservicios vía fetch.
 
 2. Subimos los archivos de nuestra aplicación a S3:
 
